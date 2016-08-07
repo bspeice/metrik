@@ -12,10 +12,9 @@ setup(
         'luigi >= 2.2.0'
     ],
     setup_requires=[
-        'pytest_runner'
+        'pytest_runner >= 2.9'
     ],
     tests_require=[
-        'pytest',
-        'python-coveralls'
+        'pytest >= 2.9.2'
     ]
 )
