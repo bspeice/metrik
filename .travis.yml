@@ -7,4 +7,5 @@ python:
   - "3.4"
   - "3.5"
 
-script: python setup.py test
+script: python setup.py test --cov metrik
+after_success: coveralls
