@@ -1,6 +1,5 @@
 from luigi import Task, Parameter
 from pyquery import PyQuery as pq
-import requests
 
 
 class BloombergEquityInfo(Task):
