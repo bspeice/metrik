@@ -9,7 +9,8 @@ setup(
     packages=find_packages(),
     install_requires=[
         'pyquery >= 1.2.13',
-        'luigi >= 2.2.0'
+        'luigi >= 2.2.0',
+        'python-daemon >= 2.1.1'
     ],
     setup_requires=[
         'pytest_runner >= 2.9'
