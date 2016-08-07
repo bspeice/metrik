@@ -10,12 +10,12 @@ setup(
     install_requires=[
         'pyquery >= 1.2.13',
         'luigi >= 2.2.0',
-        'python-daemon >= 2.1.1'
+        'python_daemon >= 2.1.1'
     ],
     setup_requires=[
-        'pytest_runner >= 2.9'
+        'pytest_runner'
     ],
     tests_require=[
-        'pytest >= 2.9.2'
+        'pytest'
     ]
 )
