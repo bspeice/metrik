@@ -1,7 +1,12 @@
 from luigi import Task, Parameter
 from pyquery import PyQuery as pq
-from urllib.parse import quote_plus
 import logging
+
+try:
+    from urllib.parse import quote_plus
+except ImportError:
+    # noinspection PyUnresolvedReferences
+    from urllib import quote_plus
 
 
 class BloombergEquityInfo(Task):
