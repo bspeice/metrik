@@ -1,5 +1,6 @@
 from luigi import Task, Parameter
 from pyquery import PyQuery as pq
+import logging
 
 
 class BloombergEquityInfo(Task):
@@ -8,6 +9,8 @@ class BloombergEquityInfo(Task):
 
     @staticmethod
     def retrieve_info(bbg_code, user_agent):
+        url = 'http://www.bloomberg.com/quote/{}'.format(bbg_code)
+        logging.info('Visiting "{}" with agent "{}'.format(url, user_agent))
         html = pq('http://www.bloomberg.com/quote/{}'.format(bbg_code),
                   {'User-Agent': user_agent})
 
