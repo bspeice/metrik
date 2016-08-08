@@ -7,9 +7,12 @@ import logging
 
 try:
     from urllib.parse import quote_plus
+    from html.parser import HTMLParser
 except ImportError:
     # noinspection PyUnresolvedReferences
     from urllib import quote_plus
+    # noinspection PyUnresolvedReferences
+    from HTMLParser import HTMLParser
 
 
 class BloombergEquityInfo(Task):
