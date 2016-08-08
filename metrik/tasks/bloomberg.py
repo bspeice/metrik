@@ -22,7 +22,13 @@ class BloombergEquityInfo(Task):
         class EquityInfoParser(HTMLParser):
 
             def __init__(self, keys):
-                super(EquityInfoParser, self).__init__()
+                # This call isn't safe because python 2 HTMLParser is an
+                # old-style class
+                try:
+                    super(EquityInfoParser, self).__init__()
+                except TypeError:
+                    pass
+
                 self.keys = keys
                 self.records = {k: None for k in keys}
                 self.do_record = {k: False for k in keys}
