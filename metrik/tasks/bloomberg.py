@@ -1,5 +1,3 @@
-from html.parser import HTMLParser
-
 import requests
 from luigi import Task, Parameter
 from pyquery import PyQuery as pq
