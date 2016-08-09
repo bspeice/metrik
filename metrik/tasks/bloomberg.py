@@ -1,4 +1,3 @@
-import requests
 from luigi import Task, Parameter
 from pyquery import PyQuery as pq
 import logging
@@ -44,7 +43,7 @@ class BloombergEquityInfo(Task):
         url = 'http://www.bloomberg.com/quote/{}'.format(
             quote_plus(bbg_code))
         logging.info('Visiting "{}" with agent "{}'.format(url, user_agent))
-        html = requests.get(url, headers={'User-Agent': user_agent}).text
+        html = pq(url, {'User-Agent': user_agent}).html()
 
         keys = ['Sector', 'Industry', 'Sub-Industry']
         eq_info = EquityInfoParser(keys)
