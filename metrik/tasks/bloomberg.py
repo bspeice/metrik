@@ -2,15 +2,11 @@ import requests
 from luigi import Task, Parameter
 from pyquery import PyQuery as pq
 import logging
-
-try:
-    from urllib.parse import quote_plus
-    from html.parser import HTMLParser
-except ImportError:
-    # noinspection PyUnresolvedReferences
-    from urllib import quote_plus
-    # noinspection PyUnresolvedReferences
-    from HTMLParser import HTMLParser
+# noinspection PyUnresolvedReferences
+from six.moves.urllib.parse import quote_plus
+# noinspection PyUnresolvedReferences
+from six.moves.html_parser import HTMLParser
+from six import PY2
 
 
 class BloombergEquityInfo(Task):
@@ -20,15 +16,11 @@ class BloombergEquityInfo(Task):
     @staticmethod
     def retrieve_info(bbg_code, user_agent):
         class EquityInfoParser(HTMLParser):
-
             def __init__(self, keys):
-                # This call isn't safe because python 2 HTMLParser is an
-                # old-style class
-                try:
+                if PY2:
+                    HTMLParser.__init__(self)
+                else:
                     super(EquityInfoParser, self).__init__()
-                except TypeError:
-                    pass
-
                 self.keys = keys
                 self.records = {k: None for k in keys}
                 self.do_record = {k: False for k in keys}

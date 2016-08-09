@@ -10,7 +10,8 @@ setup(
     install_requires=[
         'pyquery >= 1.2.13',
         'luigi >= 2.2.0',
-        'requests >= 2.9.1'
+        'requests >= 2.9.1',
+        'six >= 1.10.0'
     ],
     setup_requires=[
         'pytest_runner'
