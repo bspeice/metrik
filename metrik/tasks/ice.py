@@ -17,17 +17,22 @@ class USDLibor(Task):
         )
 
         def parse_london(dt_str):
-            # Pandas does its best to try and help us out by modifying the
-            # actual csv content to try and add timezone and date information.
-            # Which is not in any sense what we want.
-            # So we have convoluted steps to go and fix that.
+            # I'm getting inconsistent behavior in how Pandas parses the CSV
+            # file for dates and times. On Travis, it doesn't look like the
+            # content is being modified. On my computer, Pandas is spitting
+            # back a localized time. So, after parsing, if we have a timezone-
+            # enabled datetime, switch to Europe/London, and if not, add the
+            # Europe/London info to it
             london_tz = pytz.timezone('Europe/London')
             # Note that parse() implicitly adds timezone information because
             # of how pandas gave us the value
             dt = parse(dt_str).replace(year=date.year,
                                        month=date.month,
                                        day=date.day)
-            return dt.astimezone(london_tz)
+            try:
+                return dt.astimezone(london_tz)
+            except ValueError:
+                return london_tz.localize(dt)
 
         # Skip 1 row at top for header (header=0),
         # and read 7 total rows. For whatever reason,
