@@ -4,6 +4,7 @@ from six.moves.urllib.parse import quote_plus
 import pandas as pd
 import pytz
 from dateutil.parser import parse
+import logging
 
 
 class USDLibor(Task):
@@ -43,5 +44,8 @@ class USDLibor(Task):
             header=0, parse_dates=['Publication Time'],
             nrows=7, date_parser=parse_london,
         )
+        logging.info('Publication time for USD ICE on {}: {}'.format(
+            date.strftime('%m/%d/%Y'), df['Publication Time'].unique()
+        ))
 
         return df
