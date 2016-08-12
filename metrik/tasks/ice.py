@@ -1,51 +1,56 @@
 from luigi.task import Task
 # noinspection PyUnresolvedReferences
 from six.moves.urllib.parse import quote_plus
-import pandas as pd
 import pytz
+from collections import namedtuple
+import requests
+import datetime
+import csv
+from io import StringIO
 from dateutil.parser import parse
-import logging
 
 
-class USDLibor(Task):
+LiborRate = namedtuple('LiborRate', [
+    'publication', 'overnight', 'one_week', 'one_month', 'two_month',
+    'three_month', 'six_month', 'one_year', 'currency'
+])
+
+
+class LiborRateTask(Task):
 
     @staticmethod
-    def retrieve_data(date):
+    def retrieve_data(date, currency):
         url = ('https://www.theice.com/marketdata/reports/icebenchmarkadmin/'
                'ICELiborHistoricalRates.shtml?excelExport='
-               '&criteria.reportDate={}&criteria.currencyCode=USD').format(
-            quote_plus(date.strftime('%m/%d/%y'))
+               '&criteria.reportDate={}&criteria.currencyCode={}').format(
+            quote_plus(date.strftime('%m/%d/%y')),
+            currency
         )
 
-        def parse_london(dt_str):
-            # I'm getting inconsistent behavior in how Pandas parses the CSV
-            # file for dates and times. On Travis, it doesn't look like the
-            # content is being modified. On my computer, Pandas is spitting
-            # back a localized time. So, after parsing, if we have a timezone-
-            # enabled datetime, switch to Europe/London, and if not, add the
-            # Europe/London info to it
-            london_tz = pytz.timezone('Europe/London')
-            # Note that parse() implicitly adds timezone information because
-            # of how pandas gave us the value
-            dt = parse(dt_str).replace(year=date.year,
-                                       month=date.month,
-                                       day=date.day)
-            try:
-                return dt.astimezone(london_tz)
-            except ValueError:
-                return london_tz.localize(dt)
+        fields = ['tenor', 'publication', 'usd_ice_libor']
+        text = requests.get(url).text
+        f = StringIO(text)
+        next(f)  # Skip the header
+        record = {'currency': currency}
+        for row in csv.DictReader(f, fieldnames=fields):
+            mapping = {
+                'Overnight': 'overnight',
+                '1 Week': 'one_week',
+                '1 Month': 'one_month',
+                '2 Month': 'two_month',
+                '3 Month': 'three_month',
+                '6 Month': 'six_month',
+                '1 Year': 'one_year'
+            }
+            if row['usd_ice_libor']:
+                record[mapping[row['tenor']]] = float(row['usd_ice_libor'])
+            if row['publication']:
+                # Weird things happen with the publication field. For whatever reason,
+                # the *time* is correct, but very often the date gets screwed up.
+                # When I download the CSV with Firefox I only see the times - when I
+                # download with `requests`, I see both date (often incorrect) and time.
+                dt = parse(row['publication'])
+                dt = dt.replace(year=date.year, month=date.month, day=date.day)
+                record['publication'] = dt
 
-        # Skip 1 row at top for header (header=0),
-        # and read 7 total rows. For whatever reason,
-        # pandas totally ignores both skipfooter and skip_footer.
-        # WTF pandas.
-        df = pd.read_csv(
-            url, names=['Tenor', 'Publication Time', 'USD ICE LIBOR'],
-            header=0, parse_dates=['Publication Time'],
-            nrows=7, date_parser=parse_london,
-        )
-        logging.info('Publication time for USD ICE on {}: {}'.format(
-            date.strftime('%m/%d/%Y'), df['Publication Time'].unique()
-        ))
-
-        return df
+        return LiborRate(**record)
