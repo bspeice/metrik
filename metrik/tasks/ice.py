@@ -1,17 +1,15 @@
 from __future__ import print_function
-from luigi.task import Task
+
+import csv
+import requests
+from collections import namedtuple
+from dateutil.parser import parse
+from io import StringIO
+import logging
 from luigi.parameter import DateParameter, Parameter
 # noinspection PyUnresolvedReferences
 from six.moves.urllib.parse import quote_plus
-import pytz
-from collections import namedtuple
-import requests
-import datetime
-import csv
-from io import StringIO
-from dateutil.parser import parse
 
-from metrik.targets.mongo_target import MongoTarget
 from metrik.tasks.base import MongoCreateTask
 
 LiborRate = namedtuple('LiborRate', [
@@ -62,7 +60,9 @@ class LiborRateTask(MongoCreateTask):
                 # the *time* is correct, but very often the date gets screwed up.
                 # When I download the CSV with Firefox I only see the times - when I
                 # download with `requests`, I see both date (often incorrect) and time.
+                logging.info('Received string for publication time: {}'.format(row['publication']))
                 dt = parse(row['publication'])
+                logging.info('Parsed datetime: {}'.format(dt))
                 dt = dt.replace(year=date.year, month=date.month, day=date.day)
                 globals()['publication'] = dt
 
