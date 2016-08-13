@@ -1,7 +1,6 @@
 from __future__ import print_function
 
 import csv
-from tzlocal import get_localzone
 import requests
 from collections import namedtuple
 from dateutil.parser import parse
@@ -63,9 +62,6 @@ class LiborRateTask(MongoCreateTask):
                 # download with `requests`, I see both date (often incorrect) and time.
                 logging.info('Received string for publication time: {}'.format(row['publication']))
                 dt = parse(row['publication'])
-                if dt.tzinfo is None:
-                    tz = get_localzone()
-                    dt = tz.localize(dt)
                 logging.info('Parsed datetime: {}'.format(dt))
                 logging.info('Parse timezone: {}'.format(dt.tzinfo))
                 dt = dt.replace(year=date.year, month=date.month, day=date.day)
