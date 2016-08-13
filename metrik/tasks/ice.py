@@ -68,10 +68,10 @@ class LiborRateTask(MongoCreateTask):
                     # I'd be interested to know if it's an IP based thing, but the
                     # Travis settings resolve the `local` timezone to UTC so just
                     # manually set New York here to work around that.
+                    logging.warning('Correcting parsed ICE time to America/New_York')
                     tz = pytz.timezone('America/New_York')
-                    dt = tz.localize(dt)
-                logging.info('Parsed datetime: {}'.format(dt))
-                logging.info('Parse timezone: {}'.format(dt.tzinfo))
+                    dt = tz.localize(dt, is_dst=('EST' in row['publication']))
+
                 dt = dt.replace(year=date.year, month=date.month, day=date.day)
                 globals()['publication'] = dt
 
