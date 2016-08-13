@@ -61,21 +61,11 @@ class LiborRateTask(MongoCreateTask):
                 # the *time* is correct, but very often the date gets screwed up.
                 # When I download the CSV with Firefox I only see the times - when I
                 # download with `requests`, I see both date (often incorrect) and time.
-
                 dt = parse(row['publication'])
-                # if dt.tzinfo is None:
-                    # Seems like the messed up timezone is always America/New_York
-                    # I'd be interested to know if it's an IP based thing, but the
-                    # Travis settings resolve the `local` timezone to UTC so just
-                    # manually set New York here to work around that.
-                    # logging.warning('Correcting parsed ICE time to America/New_York')
-                    # tz = pytz.timezone('America/New_York')
-                    # dt = tz.localize(dt, is_dst=('EST' in row['publication']))
-
                 dt = dt.replace(year=date.year, month=date.month, day=date.day)
                 globals()['publication'] = dt
 
-        # Because of the shenanigans I did earlier with locals(), ignore
+        # Because of the shenanigans I did earlier with globals(), ignore
         # unresolved references. Probably a better way to do this.
         # noinspection PyUnresolvedReferences
         return {
