@@ -1,8 +1,7 @@
 from __future__ import print_function
 
 import csv
-import pytz
-from dateutil.tz import tzlocal
+from tzlocal import get_localzone
 import requests
 from collections import namedtuple
 from dateutil.parser import parse
@@ -65,8 +64,7 @@ class LiborRateTask(MongoCreateTask):
                 logging.info('Received string for publication time: {}'.format(row['publication']))
                 dt = parse(row['publication'])
                 if dt.tzinfo is None:
-                    tzname = tzlocal().tzname
-                    tz = pytz.timezone(tzname)
+                    tz = get_localzone()
                     dt = tz.localize(dt)
                 logging.info('Parsed datetime: {}'.format(dt))
                 logging.info('Parse timezone: {}'.format(dt.tzinfo))
