@@ -6,6 +6,6 @@ python:
   - "3.5"
 
 before_install:
-  - export TZ=Australia/Canberra
+  - export TZ=America/New_York
 install: pip install -r requirements.txt
 script: python setup.py test
