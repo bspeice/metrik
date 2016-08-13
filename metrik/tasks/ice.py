@@ -1,3 +1,4 @@
+from __future__ import print_function
 from luigi.task import Task
 from luigi.parameter import DateParameter, Parameter
 # noinspection PyUnresolvedReferences
@@ -25,7 +26,8 @@ class LiborRateTask(Task):
     currency = Parameter()
 
     def output(self):
-        return MongoTarget('libor', hash(self.task_id))
+        h = hash(str(self.to_str_params()))
+        return MongoTarget('libor', h)
 
     def run(self):
         libor_record = self.retrieve_data(self.date, self.currency)
