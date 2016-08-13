@@ -1,9 +1,9 @@
 from unittest import TestCase
 from datetime import datetime
 import pytz
+import logging
 
 from metrik.tasks.ice import LiborRateTask
-from metrik.conf import USER_AGENT
 
 
 # noinspection PyUnresolvedReferences
@@ -23,6 +23,7 @@ class TestICE(TestCase):
 
         london_tz = pytz.timezone('Europe/London')
         actual = london_tz.localize(datetime(2016, 8, 8, 11, 45, 6))
+        logging.info('Publication date in London time: {}'.format(aug8_libor['publication'].astimezone(london_tz)))
         assert aug8_libor['publication'] == actual
 
     def test_correct_libor_Aug9_2010(self):
@@ -40,6 +41,7 @@ class TestICE(TestCase):
 
         london_tz = pytz.timezone('Europe/London')
         actual = london_tz.localize(datetime(2010, 8, 9, 15, 49, 12))
+        logging.info('Publication date in London time: {}'.format(aug9_libor['publication'].astimezone(london_tz)))
         assert aug9_libor['publication'] == actual
 
     def test_correct_date_reasoning(self):
