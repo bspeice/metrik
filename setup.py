@@ -12,7 +12,8 @@ setup(
         'luigi >= 2.2.0',
         'requests >= 2.11.0',
         'six >= 1.10.0',
-        'pymongo >= 3.2'
+        'pymongo >= 3.2',
+        'pytz >= 2016.6.1'
     ],
     setup_requires=[
         'pytest_runner'
