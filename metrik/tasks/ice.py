@@ -1,4 +1,5 @@
 from luigi.task import Task
+from luigi.parameter import DateParameter, Parameter
 # noinspection PyUnresolvedReferences
 from six.moves.urllib.parse import quote_plus
 import pytz
@@ -9,6 +10,8 @@ import csv
 from io import StringIO
 from dateutil.parser import parse
 
+from metrik.targets.mongo_target import MongoTarget
+
 
 LiborRate = namedtuple('LiborRate', [
     'publication', 'overnight', 'one_week', 'one_month', 'two_month',
@@ -17,6 +20,16 @@ LiborRate = namedtuple('LiborRate', [
 
 
 class LiborRateTask(Task):
+
+    date = DateParameter()
+    currency = Parameter()
+
+    def output(self):
+        return MongoTarget('libor', hash(self.task_id))
+
+    def run(self):
+        libor_record = self.retrieve_data(self.date, self.currency)
+        self.output().persist(libor_record._asdict())
 
     @staticmethod
     def retrieve_data(date, currency):
