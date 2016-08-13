@@ -63,6 +63,7 @@ class LiborRateTask(MongoCreateTask):
                 logging.info('Received string for publication time: {}'.format(row['publication']))
                 dt = parse(row['publication'])
                 logging.info('Parsed datetime: {}'.format(dt))
+                logging.info('Parse timezone: {}'.format(dt.tzinfo))
                 dt = dt.replace(year=date.year, month=date.month, day=date.day)
                 globals()['publication'] = dt
 
