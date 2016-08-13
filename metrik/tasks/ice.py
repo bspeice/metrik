@@ -61,7 +61,7 @@ class LiborRateTask(MongoCreateTask):
                 # the *time* is correct, but very often the date gets screwed up.
                 # When I download the CSV with Firefox I only see the times - when I
                 # download with `requests`, I see both date (often incorrect) and time.
-                logging.info('Received string for publication time: {}'.format(row['publication']))
+
                 dt = parse(row['publication'])
                 if dt.tzinfo is None:
                     # Seems like the messed up timezone is always America/New_York
