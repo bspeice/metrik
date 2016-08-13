@@ -14,7 +14,6 @@ setup(
         'six >= 1.10.0',
         'pymongo >= 3.2',
         'pytz >= 2016.6.1',
-        'dateutil >= 2.4.2'
     ],
     setup_requires=[
         'pytest_runner'
