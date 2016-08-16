@@ -63,7 +63,7 @@ class LiborRateTask(MongoCreateTask):
                 dt = parse(row['publication'])
                 dt = dt.replace(year=date.year, month=date.month, day=date.day)
                 if dt.tzinfo is None:
-                    dt = timezone('Europe/London').localize(dt)
+                    dt = timezone('America/New_York').localize(dt)
                 globals()['publication'] = dt
 
         # Because of the shenanigans I did earlier with globals(), ignore
