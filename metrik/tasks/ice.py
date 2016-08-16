@@ -1,14 +1,12 @@
 from __future__ import print_function
 
 import csv
-import pytz
 import requests
 from collections import namedtuple
 from dateutil.parser import parse
 from io import StringIO
-import logging
+
 from luigi.parameter import DateParameter, Parameter
-# noinspection PyUnresolvedReferences
 from six.moves.urllib.parse import quote_plus
 
 from metrik.tasks.base import MongoCreateTask
