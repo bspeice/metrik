@@ -19,7 +19,6 @@ class MongoTarget(Target):
     def persist(self, dict_object):
         id_dict = dict_object
         id_dict['_id'] = self.id
-        id_dict['_retrieved'] = datetime.now()
         return self.collection.insert_one(id_dict).inserted_id
 
     def retrieve(self):

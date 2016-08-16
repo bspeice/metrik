@@ -5,7 +5,8 @@ python:
   - "3.4"
   - "3.5"
 
-before_install:
-  - export TZ=America/New_York
+services:
+  - mongodb
+  
 install: pip install -r requirements.txt
 script: python setup.py test
