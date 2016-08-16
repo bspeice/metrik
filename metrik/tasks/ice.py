@@ -5,6 +5,7 @@ import requests
 from collections import namedtuple
 from dateutil.parser import parse
 from io import StringIO
+from pytz import timezone
 
 from luigi.parameter import DateParameter, Parameter
 from six.moves.urllib.parse import quote_plus
@@ -61,6 +62,8 @@ class LiborRateTask(MongoCreateTask):
                 # download with `requests`, I see both date (often incorrect) and time.
                 dt = parse(row['publication'])
                 dt = dt.replace(year=date.year, month=date.month, day=date.day)
+                if dt.tzinfo is None:
+                    dt = timezone('Europe/London').localize(dt)
                 globals()['publication'] = dt
 
         # Because of the shenanigans I did earlier with globals(), ignore
