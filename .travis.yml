@@ -7,6 +7,8 @@ python:
 
 services:
   - mongodb
-  
+
+before_install:
+  - export TZ=America/New_York
 install: pip install -r requirements.txt
 script: python setup.py test
