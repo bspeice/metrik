@@ -1,6 +1,6 @@
 import requests
 import pandas as pd
-from six import StringIO
+from six import BytesIO
 
 from metrik.tasks.base import MongoNoBackCreateTask
 
@@ -15,7 +15,7 @@ class NasdaqCompanyList(MongoNoBackCreateTask):
         csv_bytes = requests.get('http://www.nasdaq.com/screening/'
                                  'companies-by-region.aspx?&render=download') \
             .content
-        csv_filelike = StringIO(csv_bytes)
+        csv_filelike = BytesIO(csv_bytes)
         company_csv = pd.read_csv(csv_filelike)[
             ['Symbol', 'Name', 'LastSale', 'MarketCap', 'Country', 'IPOyear',
              'Sector', 'Industry']
@@ -32,6 +32,6 @@ class NasdaqETFList(MongoNoBackCreateTask):
         csv_bytes = requests.get('http://www.nasdaq.com/investing/etfs/'
                                  'etf-finder-results.aspx?download=Yes') \
             .content
-        csv_filelike = StringIO(csv_bytes)
+        csv_filelike = BytesIO(csv_bytes)
         etf_csv = pd.read_csv(csv_filelike)[['Symbol', 'Name', 'LastSale']]
         return {'etfs': etf_csv.to_dict(orient='records')}
