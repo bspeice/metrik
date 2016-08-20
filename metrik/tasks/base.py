@@ -1,7 +1,12 @@
 from __future__ import print_function
-from luigi import Task
 
-from metrik.targets.mongo_target import MongoTarget
+import logging
+
+from luigi import Task
+from luigi.parameter import DateMinuteParameter
+
+from metrik.targets.mongo import MongoTarget
+from metrik.targets.noop import NoOpTarget
 
 
 class MongoCreateTask(Task):
@@ -27,3 +32,31 @@ class MongoCreateTask(Task):
     def retrieve_data(self, *args, **kwargs):
         raise NotImplementedError('Get me some data!')
 
+
+# noinspection PyAbstractClass
+class MongoNoBackCreateTask(MongoCreateTask):
+    # Have one parameter to make sure that the MongoTarget created by `super`
+    # doesn't blow up.
+    current_datetime = DateMinuteParameter()
+
+    def __init__(self, live=False, *args, **kwargs):
+        super(MongoNoBackCreateTask, self).__init__(*args, **kwargs)
+        self.live = live
+        child_name = type(self).__name__
+        if not live:
+            logging.warning('Trying to create {child_name} without running'
+                            ' live, errors potentially to ensue.'.format(child_name))
+
+    def output(self):
+        if self.live:
+            return super(MongoNoBackCreateTask, self).output()
+        else:
+            return NoOpTarget()
+
+    def run(self):
+        # It only makes sense to run these tasks live: they can only retrieve
+        # data in the moment, and can not go back to back-fill data. This is
+        # very unfortunate, but there is plenty of valuable to be had that we
+        # wish to persist for the future.
+        if self.live:
+            return super(MongoNoBackCreateTask, self).run()

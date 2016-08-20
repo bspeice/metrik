@@ -1,7 +1,7 @@
 from pymongo import MongoClient
 from random import randint
 
-from metrik.targets.mongo_target import MongoTarget
+from metrik.targets.mongo import MongoTarget
 from metrik.conf import MONGO_DATABASE, MONGO_HOST, MONGO_PORT
 from test.mongo_test import MongoTest
 

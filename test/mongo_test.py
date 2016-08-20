@@ -2,7 +2,7 @@ from unittest import TestCase
 from pymongo import MongoClient
 
 from metrik.conf import MONGO_DATABASE, MONGO_PORT, MONGO_HOST
-from metrik.targets.mongo_target import MongoTarget
+from metrik.targets.mongo import MongoTarget
 
 
 class MongoTest(TestCase):
