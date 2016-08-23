@@ -1,5 +1,5 @@
 from luigi.task import WrapperTask
-from luigi.parameter import DateMinuteParameter
+from luigi.parameter import DateMinuteParameter, BoolParameter
 import pandas as pd
 
 from metrik.trading_days import is_trading_day
@@ -7,6 +7,7 @@ from metrik.trading_days import is_trading_day
 
 class Flow(WrapperTask):
     present = DateMinuteParameter()
+    live = BoolParameter()
 
     def __init__(self, force=False, *args, **kwargs):
         super(Flow, self).__init__(*args, **kwargs)

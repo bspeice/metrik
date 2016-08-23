@@ -11,8 +11,8 @@ flows = {
 }
 
 
-def run_flow(flow_class, present):
-    build([flow_class(present=present)])
+def run_flow(flow_class, present, live):
+    build([flow_class(present=present, live=live)])
 
 
 def build_cron_file():
@@ -30,10 +30,11 @@ def build_cron_file():
 
 
 def list_flows():
-    return "Avaiable:\n\t" + "\n\t".join(flows.keys())
+    return "Available:\n\t" + "\n\t".join(flows.keys())
 
 
 def handle_commandline():
+    present_moment = datetime.now()
     parser = ArgumentParser(description='Capture ALL THE DATA off the Internet.')
     parser.add_argument('-c', '--cron', dest='cron', action='store_true',
                         help='Build the cron file used to schedule'
@@ -41,7 +42,7 @@ def handle_commandline():
     parser.add_argument('-d', '--date', dest='present',
                         help='Run a flow as if it was this time '
                              '(default: %(default)s).',
-                        default=datetime.now())
+                        default=present_moment)
     parser.add_argument('-f', '--flow', dest='flow', help='The flow to be run')
     parser.add_argument('-l', '--list-flows', dest='list', action='store_true',
                         help='List all available flows to be run.')
@@ -53,9 +54,9 @@ def handle_commandline():
         print(list_flows())
     elif args.flow:
         if type(args.present) is datetime:
-            run_flow(flows[args.flow], args.present)
+            run_flow(flows[args.flow], args.present, True)
         else:
-            run_flow(flows[args.flow], parse(args.present))
+            run_flow(flows[args.flow], parse(args.present), False)
     else:
         print("No actions specified, exiting.")
 
