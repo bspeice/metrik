@@ -1,9 +1,11 @@
 from setuptools import setup, find_packages
 
+from metrik import __version__
+
 setup(
     name='Metrik',
     description='Data aggregation framework for Python',
-    version='0.1.0',
+    version=__version__,
     author='Bradlee Speice',
     author_email='bradlee.speice@gmail.com',
     packages=find_packages(),
