@@ -3,7 +3,7 @@ from __future__ import print_function
 import logging
 
 from luigi import Task
-from luigi.parameter import DateMinuteParameter
+from luigi.parameter import DateMinuteParameter, BoolParameter
 
 from metrik.targets.mongo import MongoTarget
 from metrik.targets.noop import NoOpTarget
@@ -38,19 +38,20 @@ class MongoNoBackCreateTask(MongoCreateTask):
     # Have one parameter to make sure that the MongoTarget created by `super`
     # doesn't blow up.
     current_datetime = DateMinuteParameter()
+    live = BoolParameter()
 
-    def __init__(self, live=False, *args, **kwargs):
+    def __init__(self, *args, **kwargs):
         super(MongoNoBackCreateTask, self).__init__(*args, **kwargs)
-        self.live = live
         child_name = type(self).__name__
-        if not live:
-            logging.warning('Trying to create {child_name} without running'
+        if not self.live:
+            logging.warning('Trying to create {} without running'
                             ' live, errors potentially to ensue.'.format(child_name))
 
     def output(self):
         if self.live:
             return super(MongoNoBackCreateTask, self).output()
         else:
+            # TODO: return target closest to self.current_datetime
             return NoOpTarget()
 
     def run(self):
