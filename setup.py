@@ -15,7 +15,8 @@ setup(
         'pymongo >= 3.2',
         'pytz >= 2016.6.1',
         'python-dateutil >= 2.4.2',
-        'pandas >= 0.17.1'
+        'pandas >= 0.17.1',
+        'argparse >= 1.1.0'
     ],
     setup_requires=[
         'pytest_runner'
@@ -23,5 +24,10 @@ setup(
     tests_require=[
         'pytest',
         'pytest-catchlog'
-    ]
+    ],
+    entry_points={
+        'console_scripts': [
+            'metrik = metrik.batch:handle_commandline'
+        ]
+    }
 )

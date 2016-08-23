@@ -1,7 +1,8 @@
 from pandas.tseries.holiday import AbstractHolidayCalendar, Holiday, \
-    nearest_workday, USMartinLutherKingJr, USPresidentsDay, GoodFriday,\
+    nearest_workday, USMartinLutherKingJr, USPresidentsDay, GoodFriday, \
     USMemorialDay, USLaborDay, USThanksgivingDay
 from pandas.tseries.offsets import CustomBusinessDay
+from pandas import date_range
 
 
 class USTradingCalendar(AbstractHolidayCalendar):
@@ -17,5 +18,10 @@ class USTradingCalendar(AbstractHolidayCalendar):
         Holiday('Christmas', month=12, day=25, observance=nearest_workday)
     ]
 
+
 def TradingDay(n):
     return CustomBusinessDay(n, calendar=USTradingCalendar())
+
+
+def is_trading_day(date):
+    return bool(len(date_range(date, date, freq=TradingDay(1))))

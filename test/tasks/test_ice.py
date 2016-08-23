@@ -11,7 +11,8 @@ class TestICE(TestCase):
     def test_correct_libor_Aug8_2016(self):
         # Validate with:
         # https://www.theice.com/marketdata/reports/icebenchmarkadmin/ICELiborHistoricalRates.shtml?excelExport=&criteria.reportDate=8%2F8%2F16&criteria.currencyCode=USD
-        aug8_libor = LiborRateTask.retrieve_data(datetime(2016, 8, 8), 'USD')
+        aug8_libor = LiborRateTask.retrieve_historical_libor(
+            datetime(2016, 8, 8), 'USD')
 
         assert aug8_libor['overnight'] == .4189
         assert aug8_libor['one_week'] == .4431
@@ -23,13 +24,15 @@ class TestICE(TestCase):
 
         london_tz = pytz.timezone('Europe/London')
         actual = london_tz.localize(datetime(2016, 8, 8, 11, 45, 6))
-        logging.info('Publication date in London time: {}'.format(aug8_libor['publication'].astimezone(london_tz)))
+        logging.info('Publication date in London time: {}'.format(
+            aug8_libor['publication'].astimezone(london_tz)))
         assert aug8_libor['publication'] == actual
 
     def test_correct_libor_Aug9_2010(self):
         # Validate with:
         # https://www.theice.com/marketdata/reports/icebenchmarkadmin/ICELiborHistoricalRates.shtml?excelExport=&criteria.reportDate=8%2F9%2F10&criteria.currencyCode=USD
-        aug9_libor = LiborRateTask.retrieve_data(datetime(2010, 8, 9), 'USD')
+        aug9_libor = LiborRateTask.retrieve_historical_libor(
+            datetime(2010, 8, 9), 'USD')
 
         assert aug9_libor['overnight'] == .23656
         assert aug9_libor['one_week'] == .27725
@@ -41,7 +44,8 @@ class TestICE(TestCase):
 
         london_tz = pytz.timezone('Europe/London')
         actual = london_tz.localize(datetime(2010, 8, 9, 15, 49, 12))
-        logging.info('Publication date in London time: {}'.format(aug9_libor['publication'].astimezone(london_tz)))
+        logging.info('Publication date in London time: {}'.format(
+            aug9_libor['publication'].astimezone(london_tz)))
         assert aug9_libor['publication'] == actual
 
     def test_correct_date_reasoning(self):

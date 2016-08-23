@@ -11,6 +11,7 @@ from luigi.parameter import DateParameter, Parameter
 from six.moves.urllib.parse import quote_plus
 
 from metrik.tasks.base import MongoCreateTask
+from metrik.trading_days import TradingDay
 
 LiborRate = namedtuple('LiborRate', [
     'publication', 'overnight', 'one_week', 'one_month', 'two_month',
@@ -27,7 +28,7 @@ class LiborRateTask(MongoCreateTask):
         return 'libor'
 
     @staticmethod
-    def retrieve_data(date, currency):
+    def retrieve_historical_libor(date, currency):
         url = ('https://www.theice.com/marketdata/reports/icebenchmarkadmin/'
                'ICELiborHistoricalRates.shtml?excelExport='
                '&criteria.reportDate={}&criteria.currencyCode={}').format(
@@ -80,3 +81,12 @@ class LiborRateTask(MongoCreateTask):
             'six_month': six_month,
             'one_year': one_year
         }
+
+    @staticmethod
+    def retrieve_data(date, currency):
+        # ICE publish data a day late, so we actually need to retrieve data
+        # for the trading day prior to this.
+        return LiborRateTask.retrieve_historical_libor(
+            date - TradingDay(1),
+            currency
+        )
