@@ -30,7 +30,7 @@ def build_cron_file():
 
 
 def list_flows():
-    pass
+    print("Avaiable:" + "\n\t".join(flows.keys()))
 
 
 def handle_commandline():
