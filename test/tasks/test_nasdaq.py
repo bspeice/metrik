@@ -7,7 +7,7 @@ class NasdaqTest(TestCase):
 
     def test_company_list(self):
         companies = NasdaqCompanyList.retrieve_data()['companies']
-        assert len(companies) > 6000
+        assert len(companies) > 4000
         # TODO: Get lists of companies from ETF holdings and verify that they
         # can be found here as well - this should be a superset
 
