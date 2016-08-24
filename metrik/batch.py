@@ -5,9 +5,11 @@ from argparse import ArgumentParser
 from dateutil.parser import parse
 
 from metrik.flows.rates_flow import LiborFlow
+from metrik.flows.equities_flow import EquitiesFlow
 
 flows = {
-    'LiborFlow': LiborFlow
+    'LiborFlow': LiborFlow,
+    'EquitiesFlow': EquitiesFlow
 }
 
 
