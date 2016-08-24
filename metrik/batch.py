@@ -6,6 +6,7 @@ from dateutil.parser import parse
 
 from metrik.flows.rates_flow import LiborFlow
 from metrik.flows.equities_flow import EquitiesFlow
+from metrik import __version__
 
 flows = {
     'LiborFlow': LiborFlow,
@@ -48,6 +49,8 @@ def handle_commandline():
     parser.add_argument('-f', '--flow', dest='flow', help='The flow to be run')
     parser.add_argument('-l', '--list-flows', dest='list', action='store_true',
                         help='List all available flows to be run.')
+    parser.add_argument('-v', '--version', action='version',
+                        version=__version__)
     args = parser.parse_args()
 
     if args.cron:

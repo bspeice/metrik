@@ -5,7 +5,7 @@ from metrik.tasks.nasdaq import NasdaqETFList, NasdaqCompanyList
 class EquitiesFlow(Flow):
     @staticmethod
     def get_schedule():
-        MarketClose()
+        return MarketClose()
 
     def _requires(self):
         return [NasdaqETFList(current_datetime=self.present, live=self.live),
