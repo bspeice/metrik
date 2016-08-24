@@ -29,7 +29,7 @@ def build_cron_file():
             cron_string + ' ' + EXEC + ' ' + FLOW_FLAG + ' ' + flow_name
         )
 
-    return '\n'.join(cron_strings)
+    return '\n'.join(cron_strings) + '\n'
 
 
 def list_flows():
