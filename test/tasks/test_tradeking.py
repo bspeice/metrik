@@ -3,6 +3,7 @@ from datetime import datetime
 from pandas_datareader.data import get_data_yahoo
 from numpy.testing import assert_allclose
 import pytest
+from six.moves import map
 
 from metrik.tasks.tradeking import Tradeking1mTimesales
 from metrik.trading_days import TradingDay
@@ -18,9 +19,9 @@ def test_returns_verifiable(ticker):
 
     quotes = Tradeking1mTimesales.retrieve_data(prior_day, ticker)
 
-    yahoo_ohlc = map(tuple, get_data_yahoo(ticker, prior_day, prior_day)[
+    yahoo_ohlc = list(map(tuple, get_data_yahoo(ticker, prior_day, prior_day)[
         ['Open', 'High', 'Low', 'Close']
-    ].values)[0]
+    ].values))[0]
 
     open = high = close = 0
     low = 999999
