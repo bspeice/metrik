@@ -11,7 +11,7 @@ services:
 before_install:
   - export TZ=America/New_York
   # Encrypted .metrik.enc file contains credentials for services that are behind OAuth, etc.
-  - openssl aes-256-cbc -K $encrypted_4cca49abdb96_key -iv $encrypted_4cca49abdb96_iv -in .metrik.enc -out ~\/.metrik -d
+  - openssl aes-256-cbc -K $encrypted_4cca49abdb96_key -iv $encrypted_4cca49abdb96_iv -in .metrik.enc -out ~/.metrik -d
 
 install: pip install -r requirements.txt
 script: python setup.py test
