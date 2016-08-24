@@ -25,7 +25,7 @@ class RateLimitTest(MongoTest):
         assert ratelimit.query_locks(onesec_back) == 0
 
         ratelimit.save_lock(present)
-        assert self.db[service].count() == 1
+        assert self.db[MongoRateLimit.rate_limit_collection].count() == 1
         assert ratelimit.query_locks(onesec_back) == 1
 
     def test_save_creates_correct_service(self):
