@@ -15,42 +15,41 @@ class BaseTaskTest(TestCase):
 class RateLimitTest(MongoTest):
     def test_save_creates_record(self):
         service = 'testing_ratelimit'
+        interval = timedelta(seconds=1)
         assert self.db[MongoRateLimit.rate_limit_collection].count() == 0
 
         present = datetime.now()
         onesec_back = present - timedelta(seconds=1)
-        ratelimit = MongoRateLimit(
-            service, 1, timedelta(seconds=1)
-        )
-        assert ratelimit.query_locks(onesec_back) == 0
+        ratelimit = MongoRateLimit()
+        assert ratelimit.query_locks(onesec_back, interval, service) == 0
 
-        ratelimit.save_lock(present)
+        ratelimit.save_lock(present, service)
         assert self.db[MongoRateLimit.rate_limit_collection].count() == 1
-        assert ratelimit.query_locks(onesec_back) == 1
+        assert ratelimit.query_locks(onesec_back, interval, service) == 1
 
     def test_save_creates_correct_service(self):
         service_1 = 'testing_ratelimit_1'
         service_2 = 'testing_ratelimit_2'
+        interval = timedelta(seconds=1)
 
-        ratelimit1 = MongoRateLimit(
-            service_1, 1, timedelta(seconds=1)
-        )
-        ratelimit2 = MongoRateLimit(
-            service_2, 1, timedelta(seconds=1)
-        )
+        ratelimit = MongoRateLimit()
 
         present = datetime.now()
         assert self.db[MongoRateLimit.rate_limit_collection].count() == 0
-        assert ratelimit1.query_locks(present) == 0
-        assert ratelimit2.query_locks(present) == 0
+        assert ratelimit.query_locks(present, interval, service_1) == 0
+        assert ratelimit.query_locks(present, interval, service_2) == 0
 
-        ratelimit1.save_lock(present)
+        ratelimit.save_lock(present, service_1)
         assert self.db[MongoRateLimit.rate_limit_collection].count() == 1
-        assert ratelimit1.query_locks(present) == 1
-        assert ratelimit2.query_locks(present) == 0
+        assert ratelimit.query_locks(present, interval, service_1) == 1
+        assert ratelimit.query_locks(present, interval, service_2) == 0
 
     def test_acquire_lock_fails(self):
         service = 'testing_ratelimit'
+        limit = 1
+        interval = timedelta(seconds=1)
+        max_tries = 1
+        backoff = 10
 
         # The first scenario is as follows:
         # We try to acquire a lock with 1 try, backoff is 10.
@@ -60,19 +59,22 @@ class RateLimitTest(MongoTest):
         # lock and are only allowed one try.
         # Ultimately, we are testing that the 'fail immediately'
         # switch gets triggered correctly
-        ratelimit = MongoRateLimit(
-            service, 1, timedelta(seconds=1), max_tries=1, backoff=10
-        )
+        ratelimit = MongoRateLimit()
 
         start = datetime.now()
-        ratelimit.save_lock(start)
-        did_acquire = ratelimit.acquire_lock()
+        ratelimit.save_lock(start, service)
+        did_acquire = ratelimit.acquire_lock(service, limit, interval,
+                                             max_tries, backoff)
         end = datetime.now()
         assert not did_acquire
         assert (end - start).total_seconds() < 1
 
     def test_acquire_lock_succeeds(self):
         service = 'testing_ratelimit'
+        limit = 1
+        interval = timedelta(seconds=1)
+        max_tries = 2
+        backoff = 1
 
         # The first scenario is as follows:
         # We try to acquire a lock with two tries, backoff is 1.
@@ -80,13 +82,12 @@ class RateLimitTest(MongoTest):
         # thus when we try to acquire on the first try, we should fail.
         # However, the backoff should kick in, and we acquire successfully
         # on the second try
-        ratelimit = MongoRateLimit(
-            service, 1, timedelta(seconds=1), max_tries=2, backoff=1
-        )
+        ratelimit = MongoRateLimit()
 
         start = datetime.now()
-        ratelimit.save_lock(start - timedelta(seconds=.5))
-        did_acquire = ratelimit.acquire_lock()
+        ratelimit.save_lock(start - timedelta(seconds=.5), service)
+        did_acquire = ratelimit.acquire_lock(service, limit, interval,
+                                             max_tries, backoff)
         end = datetime.now()
         # Check that we acquired the lock
         assert did_acquire

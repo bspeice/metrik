@@ -1,16 +1,35 @@
 import os
 import sys
+# from six.moves.configparser import RawConfigParser
+from ConfigParser import RawConfigParser
 
-IS_TRAVIS = 'TRAVIS_BUILD_NUMBER' in os.environ
-IS_PYTEST = hasattr(sys, '_called_from_test')
 
-TEST = IS_PYTEST or IS_TRAVIS
+def get_config_locations():
+    return ['/etc/metrik', os.path.expanduser('~/.metrik')]
 
-USER_AGENT = "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:47.0) Gecko/20100101 Firefox/47.0"
-MONGO_HOST = 'localhost'
-MONGO_PORT = 27017
 
-if TEST:
-    MONGO_DATABASE = 'metrik'
-else:
-    MONGO_DATABASE = 'metrik-test'
+def get_default_conf():
+    cur_file_dir = os.path.dirname(os.path.realpath(__file__))
+    return open(cur_file_dir + '/default.conf', 'r')
+
+
+# Normally it's terrible practice to put static calls into the signature,
+# but this is safe (for now) since the get_config_locations() won't change
+# during a run. I.e. it starts up and that's the only time it's ever needed.
+def get_config(extra_locations=get_config_locations()):
+    config = RawConfigParser()
+
+    config.readfp(get_default_conf())
+
+    conf_files = config.read(extra_locations)
+    for conf_file in conf_files:
+        config.readfp(open(conf_file, 'r'))
+
+    # Not a huge fan of when developers think they're smarter than the
+    # end-users, but I'm calling it a special case for testing
+    is_travis = 'TRAVIS_BUILD_NUMBER' in os.environ
+    is_pytest = hasattr(sys, '_called_from_test')
+    if is_pytest or is_travis:
+        config.set('metrik', 'mongo_database', 'metrik-test')
+
+    return config

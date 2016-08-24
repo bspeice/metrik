@@ -1,18 +1,22 @@
 from unittest import TestCase
 from pymongo import MongoClient
 
-from metrik.conf import MONGO_DATABASE, MONGO_PORT, MONGO_HOST
+from metrik.conf import get_config
 from metrik.targets.mongo import MongoTarget
 
 
 class MongoTest(TestCase):
     def setUp(self):
-        self.client = MongoClient(MONGO_HOST, MONGO_PORT)
-        self.db = self.client[MONGO_DATABASE]
+        config = get_config()
+        self.client = MongoClient(
+            host=config.get('metrik', 'mongo_host'),
+            port=config.getint('metrik', 'mongo_port'))
+        self.db = self.client[config.get('metrik', 'mongo_database')]
 
     def tearDown(self):
         super(MongoTest, self).tearDown()
-        self.client.drop_database(MONGO_DATABASE)
+        config = get_config()
+        self.client.drop_database(config.get('metrik', 'mongo_database'))
 
 
 class MongoTestTest(MongoTest):

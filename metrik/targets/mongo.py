@@ -1,13 +1,18 @@
 from luigi import Target
 from pymongo import MongoClient
-from metrik.conf import MONGO_HOST, MONGO_PORT, MONGO_DATABASE
+from metrik.conf import get_config
 from datetime import datetime
 
 
 class MongoTarget(Target):
 
     def __init__(self, collection, id):
-        self.connection = MongoClient(MONGO_HOST, MONGO_PORT)[MONGO_DATABASE]
+        config = get_config()
+        self.connection = MongoClient(
+            host=config.get('metrik', 'mongo_host'),
+            port=config.get('metrik', 'mongo_port'))[
+            config.get('metrik', 'mongo_database')
+        ]
         self.collection = self.connection[collection]
         self.id = id
 

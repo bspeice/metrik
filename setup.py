@@ -18,7 +18,8 @@ setup(
         'pytz >= 2016.6.1',
         'python-dateutil >= 2.4.2',
         'pandas >= 0.17.1',
-        'argparse >= 1.1.0'
+        'argparse >= 1.1.0',
+        'requests-oauthlib >= 0.4.0'
     ],
     setup_requires=[
         'pytest_runner'

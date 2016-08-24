@@ -3,7 +3,9 @@ from luigi import build
 from datetime import datetime
 from argparse import ArgumentParser
 from dateutil.parser import parse
+from six import StringIO
 
+from metrik.conf import get_config
 from metrik.flows.rates_flow import LiborFlow
 from metrik.flows.equities_flow import EquitiesFlow
 from metrik import __version__
@@ -49,6 +51,7 @@ def handle_commandline():
     parser.add_argument('-f', '--flow', dest='flow', help='The flow to be run')
     parser.add_argument('-l', '--list-flows', dest='list', action='store_true',
                         help='List all available flows to be run.')
+    parser.add_argument('-o', '--config', action='store_true')
     parser.add_argument('-v', '--version', action='version',
                         version=__version__)
     args = parser.parse_args()
@@ -57,6 +60,11 @@ def handle_commandline():
         print(build_cron_file())
     elif args.list:
         print(list_flows())
+    elif args.config:
+        config = get_config()
+        s = StringIO
+        config.write(s)
+        print(s.getvalue())
     elif args.flow:
         if type(args.present) is datetime:
             run_flow(flows[args.flow], args.present, True)

@@ -10,7 +10,7 @@ from pymongo import MongoClient
 
 from metrik.targets.mongo import MongoTarget
 from metrik.targets.noop import NoOpTarget
-from metrik.conf import MONGO_HOST, MONGO_PORT, MONGO_DATABASE
+from metrik.conf import get_config
 
 
 class MongoCreateTask(Task):
@@ -70,52 +70,50 @@ class MongoNoBackCreateTask(MongoCreateTask):
 class MongoRateLimit(object):
     rate_limit_collection = 'rate_limit'
 
-    def __init__(self, service, limit, interval, max_tries=5, backoff=.5):
-        """
-
-        :param present:
-        :type present: datetime.datetime
-        :param service:
-        :param limit:
-        :param interval:
-        :type interval: datetime.timedelta
-        :param max_tries:
-        :param backoff:
-        """
-        self.service = service
-        self.limit = limit
-        self.interval = interval
-        self.max_tries = max_tries
-        self.backoff = backoff
-        self.db = MongoClient(host=MONGO_HOST, port=MONGO_PORT)[MONGO_DATABASE]
+    def __init__(self):
+        config = get_config()
+        self.db = MongoClient(
+            host=config.get('metrik', 'mongo_host'),
+            port=config.getint('metrik', 'mongo_port'))[
+            config.get('metrik', 'mongo_database')
+        ]
 
     def get_present(self):
         return datetime.datetime.now()
 
-    def query_locks(self, present):
+    def query_locks(self, present, interval, service):
         return self.db[self.rate_limit_collection].find(
-            {'_created_at': {'$gt': present - self.interval},
-             'service': self.service}).count()
+            {'_created_at': {'$gt': present - interval},
+             'service': service}).count()
 
-    def save_lock(self, present):
+    def save_lock(self, present, service):
         self.db[self.rate_limit_collection].save({
-            '_created_at': present, 'service': self.service
+            '_created_at': present, 'service': service
         })
 
-    def sleep_until(self, present):
-        future_time = present + self.interval * self.backoff
+    def sleep_until(self, present, interval, backoff):
+        future_time = present + interval * backoff
         return (future_time - present).total_seconds()
 
-    def acquire_lock(self):
+    def acquire_lock(self, service, limit, interval, max_tries=5, backoff=.5):
         num_tries = 0
-        while num_tries < self.max_tries:
+        while num_tries < max_tries:
             num_tries += 1
-            num_locks = self.query_locks(self.get_present())
-            if num_locks < self.limit:
-                self.save_lock(self.get_present())
+            num_locks = self.query_locks(
+                self.get_present(),
+                interval,
+                service
+            )
+
+            if num_locks < limit:
+                self.save_lock(self.get_present(), service)
                 return True
-            elif num_tries < self.max_tries:
-                sleep_amount = self.sleep_until(self.get_present())
+            elif num_tries < max_tries:
+                sleep_amount = self.sleep_until(
+                    self.get_present(),
+                    interval,
+                    backoff
+                )
                 sleep(sleep_amount)
 
         return False
