@@ -2,7 +2,7 @@ from pymongo import MongoClient
 from random import randint
 
 from metrik.targets.mongo import MongoTarget
-from metrik.conf import MONGO_DATABASE, MONGO_HOST, MONGO_PORT
+from metrik.conf import get_config
 from test.mongo_test import MongoTest
 
 
@@ -17,8 +17,7 @@ class MongoTargetTest(MongoTest):
         t.persist({'a': 'b'})
         assert t.exists()
 
-        db = MongoClient(MONGO_HOST, MONGO_PORT)[MONGO_DATABASE]
-        db_collection = db[collection]
+        db_collection = self.db[collection]
         db_collection.remove(id)
         assert not t.exists()
 
