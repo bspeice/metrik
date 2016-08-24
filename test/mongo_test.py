@@ -6,10 +6,13 @@ from metrik.targets.mongo import MongoTarget
 
 
 class MongoTest(TestCase):
+    def setUp(self):
+        self.client = MongoClient(MONGO_HOST, MONGO_PORT)
+        self.db = self.client[MONGO_DATABASE]
+
     def tearDown(self):
         super(MongoTest, self).tearDown()
-        client = MongoClient(MONGO_HOST, MONGO_PORT)
-        client.drop_database(MONGO_DATABASE)
+        self.client.drop_database(MONGO_DATABASE)
 
 
 class MongoTestTest(MongoTest):
