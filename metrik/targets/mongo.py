@@ -10,7 +10,7 @@ class MongoTarget(Target):
         config = get_config()
         self.connection = MongoClient(
             host=config.get('metrik', 'mongo_host'),
-            port=config.get('metrik', 'mongo_port'))[
+            port=config.getint('metrik', 'mongo_port'))[
             config.get('metrik', 'mongo_database')
         ]
         self.collection = self.connection[collection]
