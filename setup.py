@@ -26,7 +26,8 @@ setup(
     ],
     tests_require=[
         'pytest',
-        'pytest-catchlog'
+        'pytest-catchlog',
+        'pandas-datareader'
     ],
     entry_points={
         'console_scripts': [
