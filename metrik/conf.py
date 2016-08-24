@@ -1,7 +1,6 @@
 import os
 import sys
-# from six.moves.configparser import RawConfigParser
-from ConfigParser import RawConfigParser
+from six.moves.configparser import RawConfigParser
 
 
 def get_config_locations():
