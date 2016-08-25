@@ -118,9 +118,9 @@ class RateLimitTest(MongoTest):
         end = datetime.now()
         # Check that we acquired the lock
         assert did_acquire
-        # Check that we only used one backoff period
+        # Check that we used at least one backoff period
         total_seconds = (end - start).total_seconds()
-        assert 1 < total_seconds < 2
+        assert 1 < total_seconds
 
     def test_sleep_for_gives_correct_time(self):
         ratelimit = MongoRateLimit()
