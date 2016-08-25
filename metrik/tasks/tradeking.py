@@ -48,26 +48,33 @@ class Tradeking1mTimesales(MongoCreateTask):
             interval=timedelta(minutes=1)
         )
         if did_acquire:
-            json_data = tradeking.api_request('market/timesales', {
+            response = tradeking.api_request('market/timesales', {
                 'symbols': symbol,
                 'interval': '1min',
                 'startdate': present.strftime('%Y-%m-%d'),
                 'enddate': present.strftime('%Y-%m-%d')
-            }).json()
+            })
+            json_data = response.json()
 
             quotes = json_data['response']['quotes']['quote']
+
             def format_quote(quote):
-                return {
-                    'last': float(quote['last']),
-                    'lo': float(quote['lo']),
-                    'vl': int(quote['vl']),
-                    'datetime': parse(quote['datetime']),
-                    'incr_vl': int(quote['incr_vl']),
-                    'hi': float(quote['hi']),
-                    'timestamp': parse(quote['timestamp']),
-                    'date': parse(quote['date']),
-                    'opn': float(quote['opn'])
-                }
+                if quote == '':
+                    logging.warning('Empty quote for symbol {}'.format(symbol))
+                    return {}
+                else:
+                    return {
+                        'last': float(quote['last']),
+                        'lo': float(quote['lo']),
+                        'vl': int(quote['vl']),
+                        'datetime': parse(quote['datetime']),
+                        'incr_vl': int(quote['incr_vl']),
+                        'hi': float(quote['hi']),
+                        'timestamp': parse(quote['timestamp']),
+                        'date': parse(quote['date']),
+                        'opn': float(quote['opn'])
+                    }
+
             quotes_typed = [format_quote(q) for q in quotes]
 
             return {
