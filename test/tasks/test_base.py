@@ -92,4 +92,39 @@ class RateLimitTest(MongoTest):
         # Check that we acquired the lock
         assert did_acquire
         # Check that we only used one backoff period
-        assert (end - start).total_seconds() < 2
+        total_seconds = (end - start).total_seconds()
+        assert 1 < total_seconds < 2
+
+    def test_acquire_lock_succeeds_float(self):
+        # And do the whole thing all over again, but with a floating backoff
+        service = 'testing_ratelimit'
+        limit = 1
+        interval = timedelta(seconds=1)
+        max_tries = 2
+        backoff = 1.01
+
+        # The first scenario is as follows:
+        # We try to acquire a lock with two tries, backoff is 1.
+        # We put a single lock in initially (a half second in the past),
+        # thus when we try to acquire on the first try, we should fail.
+        # However, the backoff should kick in, and we acquire successfully
+        # on the second try
+        ratelimit = MongoRateLimit()
+
+        start = datetime.now()
+        ratelimit.save_lock(start - timedelta(seconds=.5), service)
+        did_acquire = ratelimit.acquire_lock(service, limit, interval,
+                                             max_tries, backoff)
+        end = datetime.now()
+        # Check that we acquired the lock
+        assert did_acquire
+        # Check that we only used one backoff period
+        total_seconds = (end - start).total_seconds()
+        assert 1 < total_seconds < 2
+
+    def test_sleep_for_gives_correct_time(self):
+        ratelimit = MongoRateLimit()
+
+        assert ratelimit.sleep_for(timedelta(seconds=1), 1) == 1
+        assert ratelimit.sleep_for(timedelta(seconds=1), 2) == 2
+        assert ratelimit.sleep_for(timedelta(seconds=1), 1.1) == 1.1

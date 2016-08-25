@@ -35,10 +35,8 @@ class Tradeking1mTimesales(MongoCreateTask):
     present = DateParameter()
     symbol = Parameter()
 
-    def acquire_lock(self, service, limit, interval, max_tries=5, backoff=.5):
-        return super(Tradeking1mTimesales, self).acquire_lock(
-            'tradeking', 60, timedelta(minutes=1)
-        )
+    def get_collection_name(self):
+        return 'tradeking_1min'
 
     @staticmethod
     def retrieve_data(present, symbol):

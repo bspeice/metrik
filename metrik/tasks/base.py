@@ -91,9 +91,8 @@ class MongoRateLimit(object):
             '_created_at': present, 'service': service
         })
 
-    def sleep_until(self, present, interval, backoff):
-        future_time = present + interval * backoff
-        return (future_time - present).total_seconds()
+    def sleep_for(self, interval, backoff):
+        return interval.total_seconds() * backoff
 
     def acquire_lock(self, service, limit, interval, max_tries=5, backoff=.5):
         num_tries = 0
@@ -109,13 +108,7 @@ class MongoRateLimit(object):
                 self.save_lock(self.get_present(), service)
                 return True
             elif num_tries < max_tries:
-                sleep_amount = self.sleep_until(
-                    self.get_present(),
-                    interval,
-                    backoff
-                )
+                sleep_amount = self.sleep_for(interval, backoff)
                 sleep(sleep_amount)
 
         return False
-
-
