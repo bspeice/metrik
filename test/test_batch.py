@@ -14,5 +14,4 @@ class BatchTest(TestCase):
 
     def test_cron_string(self):
         cron_string = build_cron_file()
-        assert len(cron_string.split('\n')) == len(flows) + 1
         assert cron_string[-1] == '\n'

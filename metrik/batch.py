@@ -4,6 +4,8 @@ from datetime import datetime
 from argparse import ArgumentParser
 from dateutil.parser import parse
 from six import StringIO
+from subprocess import check_output
+from os import path
 
 from metrik.conf import get_config
 from metrik.flows.rates_flow import LiborFlow
@@ -23,15 +25,24 @@ def run_flow(flow_class, present, live):
 def build_cron_file():
     EXEC = 'metrik'
     FLOW_FLAG = '-f'
+    USER = 'root'
 
+    metrik_command_location = path.dirname(check_output(['which', 'metrik']))
+    cron_header = '''# cron.d entries for metrik
+
+SHELL=/bin/sh
+PATH={}
+
+'''.format(metrik_command_location)
     cron_strings = []
     for flow_name, flow_class in flows.items():
         cron_string = flow_class.get_schedule().get_cron_string()
         cron_strings.append(
-            cron_string + ' ' + EXEC + ' ' + FLOW_FLAG + ' ' + flow_name
+            cron_string + ' ' + USER + ' ' + EXEC + ' ' +
+            FLOW_FLAG + ' ' + flow_name
         )
 
-    return '\n'.join(cron_strings) + '\n'
+    return cron_header + '\n'.join(cron_strings) + '\n'
 
 
 def list_flows():
