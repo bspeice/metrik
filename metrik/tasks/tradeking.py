@@ -65,7 +65,7 @@ class Tradeking1mTimesales(MongoCreateTask):
                     'incr_vl': int(quote['incr_vl']),
                     'hi': float(quote['hi']),
                     'timestamp': parse(quote['timestamp']),
-                    'date': parse(quote['date']).date(),
+                    'date': parse(quote['date']),
                     'opn': float(quote['opn'])
                 }
             quotes_typed = [format_quote(q) for q in quotes]

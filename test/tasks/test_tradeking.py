@@ -4,13 +4,16 @@ from pandas_datareader.data import get_data_yahoo
 from numpy.testing import assert_allclose
 import pytest
 from six.moves import map
+from pytz import utc
 
 from metrik.tasks.tradeking import Tradeking1mTimesales
 from metrik.trading_days import TradingDay
+from metrik.targets.mongo import MongoTarget
+from test.mongo_test import MongoTest
 
 
 @pytest.mark.parametrize('ticker', [
-    'AAPL', 'GOOG', 'SPY', 'REGN', 'SWHC', 'BAC', 'NVCR'
+    'AAPL', 'GOOG', 'SPY', 'REGN', 'SWHC', 'BAC', 'NVCR', 'ARGT'
 ])
 def test_returns_verifiable(ticker):
     # Test that the quotes line up with data off of Yahoo
@@ -36,3 +39,20 @@ def test_returns_verifiable(ticker):
     tradeking_ohlc = (open, high, low, close)
 
     assert_allclose(tradeking_ohlc, yahoo_ohlc, rtol=1e-3)
+
+class TradekingTest(MongoTest):
+
+    def test_record_is_saveable(self):
+        # Had an issue previously where the `date` type would cause saving
+        # to fail. Make sure that doesn't continue
+        now = datetime.now()
+        prior_day = now - TradingDay(1)
+        quotes = Tradeking1mTimesales.retrieve_data(prior_day, 'AAPL')
+        t = MongoTarget('tradeking', hash('just_testing'))
+        t.persist(quotes)
+        quotes_retrieved = t.retrieve()
+        for quote in quotes_retrieved['quotes']:
+            quote['datetime'] = utc.localize(quote['datetime'])
+            quote['timestamp'] = utc.localize(quote['timestamp'])
+
+        assert quotes == quotes_retrieved
