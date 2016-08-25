@@ -59,8 +59,8 @@ class Tradeking1mTimesales(MongoCreateTask):
             quotes = json_data['response']['quotes']['quote']
 
             def format_quote(quote):
-                if quote == '':
-                    logging.warning('Empty quote for symbol {}'.format(symbol))
+                if type(quote) != dict:
+                    logging.warning('Bad quote for symbol {}: {}'.format(symbol, quote))
                     return {}
                 else:
                     return {
