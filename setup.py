@@ -9,6 +9,9 @@ setup(
     author='Bradlee Speice',
     author_email='bradlee.speice@gmail.com',
     packages=find_packages(),
+    package_data={
+        'metrik': ['default.conf']
+    },
     install_requires=[
         'pyquery >= 1.2.13',
         'luigi >= 2.2.0',
