@@ -1,30 +1,41 @@
 from luigi import Target
 from pymongo import MongoClient
-from metrik.conf import get_config
 from datetime import datetime
+from contextlib import contextmanager
+
+from metrik.conf import get_config
 
 
 class MongoTarget(Target):
 
-    def __init__(self, collection, id):
+    @contextmanager
+    def get_db(self):
         config = get_config()
-        self.connection = MongoClient(
+        client = MongoClient(
             host=config.get('metrik', 'mongo_host'),
-            port=config.getint('metrik', 'mongo_port'))[
-            config.get('metrik', 'mongo_database')
-        ]
-        self.collection = self.connection[collection]
+            port=config.getint('metrik', 'mongo_port'))
+
+        yield client[config.get('metrik', 'mongo_database')]
+
+        client.close()
+
+    def __init__(self, collection, id):
+        self.collection = collection
         self.id = id
 
     def exists(self):
-        return self.collection.find_one({
-            '_id': self.id
-        }) is not None
+        with self.get_db() as db:
+            return db[self.collection].find_one({
+                '_id': self.id
+            }) is not None
 
     def persist(self, dict_object):
         id_dict = dict_object
         id_dict['_id'] = self.id
-        return self.collection.insert_one(id_dict).inserted_id
+
+        with self.get_db() as db:
+            return db[self.collection].insert_one(id_dict).inserted_id
 
     def retrieve(self):
-        return self.collection.find_one({'_id': self.id})
+        with self.get_db() as db:
+            return db[self.collection].find_one({'_id': self.id})
