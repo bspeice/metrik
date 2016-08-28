@@ -13,7 +13,6 @@ setup(
         'metrik': ['default.conf']
     },
     install_requires=[
-        'pyquery >= 1.2.13',
         'luigi >= 2.2.0',
         'requests >= 2.11.0',
         'six >= 1.10.0',
