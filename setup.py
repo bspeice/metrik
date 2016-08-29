@@ -33,7 +33,8 @@ setup(
     ],
     entry_points={
         'console_scripts': [
-            'metrik = metrik.batch:handle_commandline'
+            'metrik = metrik.batch:handle_commandline',
+            'metrik-merge = metrik.merge:main'
         ]
     }
 )
