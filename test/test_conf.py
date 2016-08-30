@@ -10,8 +10,9 @@ class ConfigurationTest(TestCase):
         assert config is not None
 
     def test_config_manual_test_instruction(self):
+        # This assertion will fail if you're not using pytest or running on Travis
         config = get_config()
-        self.assertEqual(config.get('metrik', 'mongo_database'), 'metrik')
+        self.assertEqual(config.get('metrik', 'mongo_database'), 'metrik-test')
 
         # This assertion will fail if you're not using pytest or running on Travis
         config = get_config(is_test=False)
