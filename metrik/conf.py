@@ -15,7 +15,7 @@ def get_default_conf():
 # Normally it's terrible practice to put static calls into the signature,
 # but this is safe (for now) since the get_config_locations() won't change
 # during a run. I.e. it starts up and that's the only time it's ever needed.
-def get_config(extra_locations=get_config_locations()):
+def get_config(extra_locations=get_config_locations(), is_test=False):
     config = RawConfigParser()
 
     config.readfp(get_default_conf())
@@ -28,7 +28,7 @@ def get_config(extra_locations=get_config_locations()):
     # end-users, but I'm calling it a special case for testing
     is_travis = 'TRAVIS_BUILD_NUMBER' in os.environ
     is_pytest = hasattr(sys, '_called_from_test')
-    if is_pytest or is_travis:
+    if is_pytest or is_travis or is_test:
         config.set('metrik', 'mongo_database', 'metrik-test')
 
     return config

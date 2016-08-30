@@ -33,3 +33,14 @@ class MergeTest(MongoTest):
         assert item_retrieved is not None
         assert item_retrieved['string'] == item_string
 
+    def test_merge_is_nondestructive(self):
+        item1_id = self.db2[self.collection_name].save({})
+        item2_id = self.db[self.collection_name].save({})
+
+        assert len(list(self.db[self.collection_name].find())) == 1
+        assert len(list(self.db2[self.collection_name].find())) == 1
+
+        merge(self.client, self.client,
+              self.db.name, self.db2.name)
+        assert len(list(self.db[self.collection_name].find())) == 0
+        assert len(list(self.db2[self.collection_name].find())) == 2

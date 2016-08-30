@@ -7,7 +7,7 @@ from metrik.targets.mongo import MongoTarget
 
 class MongoTest(TestCase):
     def setUp(self):
-        config = get_config()
+        config = get_config(is_test=True)
         self.client = MongoClient(
             host=config.get('metrik', 'mongo_host'),
             port=config.getint('metrik', 'mongo_port'))
@@ -15,7 +15,7 @@ class MongoTest(TestCase):
 
     def tearDown(self):
         super(MongoTest, self).tearDown()
-        config = get_config()
+        config = get_config(is_test=True)
         self.client.drop_database(config.get('metrik', 'mongo_database'))
 
 
