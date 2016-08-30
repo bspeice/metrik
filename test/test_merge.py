@@ -1,4 +1,4 @@
-import random, string
+from random import randint
 
 from metrik.merge import merge, open_connection
 from metrik.conf import get_config
@@ -19,7 +19,7 @@ class MergeTest(MongoTest):
         self.client2.drop_database(self.db2_name)
 
     def test_left_right_merge(self):
-        item_string = ''.join(random.choice(string.lowercase) for i in range(10))
+        item_string = str(randint(-9999999, 9999999))
         item = {'string': item_string}
         item_id = self.db[self.collection_name].save(item)
 
