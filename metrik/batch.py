@@ -62,7 +62,14 @@ def handle_commandline():
     parser.add_argument('-f', '--flow', dest='flow', help='The flow to be run')
     parser.add_argument('-l', '--list-flows', dest='list', action='store_true',
                         help='List all available flows to be run.')
-    parser.add_argument('-o', '--config', action='store_true')
+    parser.add_argument('-o', '--config', action='store_true',
+                        help='Output the default configuration to allow you '
+                             'tweaking the settings. Please place at ~/.metrik,'
+                             'or /etc/metrik')
+    parser.add_argument('-t', '--tainted', action='store_true', default=False,
+                        help='Run in \'tainted\' mode, which treats the system'
+                             ' as if it were live even though a `-d` switch '
+                             'may be present.')
     parser.add_argument('-v', '--version', action='version',
                         version=__version__)
     args = parser.parse_args()
@@ -80,7 +87,7 @@ def handle_commandline():
         if type(args.present) is datetime:
             run_flow(flows[args.flow], args.present, True)
         else:
-            run_flow(flows[args.flow], parse(args.present), False)
+            run_flow(flows[args.flow], parse(args.present), args.tainted)
     else:
         print("No actions specified, exiting.")
 
