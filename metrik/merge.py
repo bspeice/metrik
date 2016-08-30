@@ -9,9 +9,9 @@ def open_connection(host, port):
     return MongoClient(host=host, port=port)
 
 
-def merge(con1, con2, database_name='metrik'):
-    database1 = con1[database_name]
-    database2 = con2[database_name]
+def merge(con1, con2, db1, db2):
+    database1 = con1[db1]
+    database2 = con2[db2]
     collections = database1.collection_names(include_system_collections=False)
     for collection_name in collections:
         collection1 = database1[collection_name]
@@ -37,14 +37,16 @@ def main():
                         help='The port number of the `left` database')
     parser.add_argument('-o', '--port-2', default=27017, dest='port2', type=int,
                         help='The port number of the `right` database')
-    parser.add_argument('-d', '--database', default='metrik',
-                        help='The database to merge from one host to the other')
+    parser.add_argument('-d', '--database-1', default='metrik', dest='db1',
+                        help='The database on the `left` host we are merging from')
+    parser.add_argument('-s', '--database-2', default='metrik', dest='db2',
+                        help='The database on the `right` host we are merging into')
     parser.add_argument('-v', '--version', action='version', version=__version__)
     args = parser.parse_args()
 
     con1 = open_connection(args.host1, args.port1)
     con2 = open_connection(args.host2, args.port2)
-    merge(con1, con2, args.database)
+    merge(con1, con2, args.db1, args.db2)
     con1.close()
     con2.close()
 
