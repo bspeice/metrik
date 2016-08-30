@@ -13,8 +13,9 @@ class ConfigurationTest(TestCase):
         config = get_config()
         self.assertEqual(config.get('metrik', 'mongo_database'), 'metrik')
 
+        # This assertion will fail if you're not using pytest or running on Travis
         config = get_config(is_test=False)
-        self.assertEqual(config.get('metrik', 'mongo_database'), 'metrik')
+        self.assertEqual(config.get('metrik', 'mongo_database'), 'metrik-test')
 
         config = get_config(is_test=True)
         self.assertEqual(config.get('metrik', 'mongo_database'), 'metrik-test')
