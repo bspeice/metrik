@@ -21,7 +21,8 @@ setup(
         'python-dateutil >= 2.4.2',
         'pandas >= 0.17.1',
         'argparse >= 1.1.0',
-        'requests-oauthlib >= 0.4.0'
+        'requests-oauthlib >= 0.4.0',
+        'xlrd >= 0.9.4'
     ],
     setup_requires=[
         'pytest_runner'
