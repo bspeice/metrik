@@ -1,6 +1,8 @@
 from metrik.flows.base import Flow, MarketClose
 from metrik.tasks.nasdaq import NasdaqETFList, NasdaqCompanyList
 from metrik.tasks.tradeking import Tradeking1mTimesales
+from metrik.tasks.state_street import StateStreetHoldings
+from metrik.conf import get_config
 
 
 class EquitiesFlow(Flow):
@@ -12,6 +14,8 @@ class EquitiesFlow(Flow):
         return MarketClose()
 
     def _run(self):
+        config = get_config()
+
         # When we yield dependencies in `run` instead of `_requires`,
         # they get executed dynamically and we can use their results inline
         etfs = NasdaqETFList(current_datetime=self.present, live=self.live)
@@ -32,3 +36,11 @@ class EquitiesFlow(Flow):
             symbol=c['Symbol']
         ) for c in companies.output().retrieve()['companies']]
         yield tradeking_companies
+
+        state_street_etfs = config.get('statestreet', 'etf_holdings')
+        state_street_holdings = [
+            StateStreetHoldings(current_datetime=self.present, live=self.live,
+                                ticker=t.strip())
+            for t in state_street_etfs.split(',')
+        ]
+        yield state_street_holdings
