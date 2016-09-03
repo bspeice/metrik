@@ -31,3 +31,11 @@ class MongoTargetTest(MongoTest):
 
         u = MongoTarget(collection, id)
         assert u.retrieve() == d
+
+    def test_scaling(self):
+        # There was an issue in the past where creating too many targets
+        # blew things up because it would allocate threads on construction.
+        # Make sure we can trivially scale correctly
+        targets = [MongoTarget('test_collection', i) for i in range(10000)]
+
+        self.assertEqual(len(targets), 10000)
