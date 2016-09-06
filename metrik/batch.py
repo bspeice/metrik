@@ -8,12 +8,10 @@ from subprocess import check_output
 from os import path
 
 from metrik.conf import get_config
-from metrik.flows.rates_flow import LiborFlow
 from metrik.flows.equities_flow import EquitiesFlow
 from metrik import __version__
 
 flows = {
-    'LiborFlow': LiborFlow,
     'EquitiesFlow': EquitiesFlow
 }
 
