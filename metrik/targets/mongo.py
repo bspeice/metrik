@@ -4,6 +4,7 @@ from datetime import datetime
 from contextlib import contextmanager
 
 from metrik.conf import get_config
+from metrik import __version__ as version
 
 
 class MongoTarget(Target):
@@ -29,9 +30,12 @@ class MongoTarget(Target):
                 '_id': self.id
             }) is not None
 
-    def persist(self, dict_object):
+    def persist(self, dict_object, present=None):
         id_dict = dict_object
         id_dict['_id'] = self.id
+        id_dict['_metrik_version'] = version
+        id_dict['_created_at'] = (present if present is not None
+                                  else datetime.now())
 
         with self.get_db() as db:
             return db[self.collection].insert_one(id_dict).inserted_id
