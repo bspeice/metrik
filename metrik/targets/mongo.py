@@ -38,8 +38,7 @@ class MongoTarget(Target):
         # Because MongoDB isn't microsecond-accurate, we need to set the
         # microseconds to 0 to ensure consistency
         present_deref = present if present is not None else datetime.now()
-        present_deref.replace(microsecond=0)
-        id_dict['_created_at'] = present_deref
+        id_dict['_created_at'] = present_deref.replace(microsecond=0)
 
         with self.get_db() as db:
             return db[self.collection].insert_one(id_dict).inserted_id

@@ -54,8 +54,8 @@ class MongoTargetTest(MongoTest):
         r = t.retrieve()
         self.assertGreaterEqual(present, r['_created_at'])
 
-        one_second_past = present - timedelta(seconds=1)
+        second_prior = (present - timedelta(seconds=1)).replace(microsecond=0)
         t = MongoTarget('test_collection', 1235)
-        t.persist({}, present=one_second_past)
+        t.persist({}, present=second_prior)
         r = t.retrieve()
-        self.assertEqual(one_second_past, r['_created_at'])
+        self.assertEqual(second_prior, r['_created_at'])
