@@ -34,8 +34,12 @@ class MongoTarget(Target):
         id_dict = dict_object
         id_dict['_id'] = self.id
         id_dict['_metrik_version'] = version
-        id_dict['_created_at'] = (present if present is not None
-                                  else datetime.now())
+
+        # Because MongoDB isn't microsecond-accurate, we need to set the
+        # microseconds to 0 to ensure consistency
+        present_deref = present if present is not None else datetime.now()
+        present_deref.replace(microsecond=0)
+        id_dict['_created_at'] = present_deref
 
         with self.get_db() as db:
             return db[self.collection].insert_one(id_dict).inserted_id
