@@ -3,9 +3,9 @@ from metrik.conf import get_config
 from metrik.tasks.cboe import CboeOptionableList
 from metrik.tasks.tradeking import TradekingOptionsQuotes
 
-class EquitiesFlow(Flow):
+class OptionsFlow(Flow):
     def __init__(self, *args, **kwargs):
-        super(EquitiesFlow, self).__init__(*args, **kwargs)
+        super(OptionsFlow, self).__init__(*args, **kwargs)
 
     @staticmethod
     def get_schedule():

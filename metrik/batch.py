@@ -9,10 +9,12 @@ from os import path
 
 from metrik.conf import get_config
 from metrik.flows.equities_flow import EquitiesFlow
+from metrik.flows.options_flow import OptionsFlow
 from metrik import __version__
 
 flows = {
-    'EquitiesFlow': EquitiesFlow
+    'EquitiesFlow': OptionsFlow,
+    'OptionsFlow': OptionsFlow
 }
 
 
