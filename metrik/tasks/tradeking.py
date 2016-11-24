@@ -9,6 +9,13 @@ from metrik.tasks.base import MongoCreateTask, MongoRateLimit, MongoNoBackCreate
 from metrik.conf import get_config
 
 
+def batch(iterable, size):
+    sourceiter = iter(iterable)
+    while True:
+        batchiter = islice(sourceiter, size)
+        yield chain([batchiter.next()], batchiter)
+
+
 class TradekingApi(object):
     format_json = '.json'
     format_xml = '.xml'
@@ -87,6 +94,7 @@ class Tradeking1mTimesales(MongoCreateTask):
 
 
 class TradekingOptionsQuotes(MongoNoBackCreateTask):
+    batch_size = 75
     symbol = Parameter()
 
     def get_collection_name(self):
@@ -102,8 +110,18 @@ class TradekingOptionsQuotes(MongoNoBackCreateTask):
         return [r['symbol'] for r in results]
 
     @staticmethod
+    def retrieve_quotes(api, symbols):
+        response = api.api_request('market/ext/quotes', {
+            'symbols': ','.join(symbols)
+        })
+
+        results = response.json()['response']['quotes']['quote']
+
+        return results
+
+    @staticmethod
     def retrieve_data(symbol):
-        tradeking = TradekingApi()
+        api = TradekingApi()
 
         # We request a first rate limit lock to get the options chain
         ratelimit = MongoRateLimit()
@@ -112,3 +130,21 @@ class TradekingOptionsQuotes(MongoNoBackCreateTask):
             limit=60,
             interval=timedelta(minutes=1)
         )
+
+        if not chain_acquire:
+            return {}
+
+
+        chain = TradekingOptionsQuotes.retrieve_chain_syms(api, symbol)
+        results = []
+        for b in batch(chain, TradekingOptionsQuotes.batch_size):
+            batch_acquire = ratelimit.acquire_lock(
+                service='tradeking',
+                limit=60,
+                interval=timedelta(minutes=1)
+            )
+            if batch_acquire:
+                batch_results = TradekingOptionsQuotes.retrieve_quotes(api, b)
+                results += batch_results
+
+        return results
