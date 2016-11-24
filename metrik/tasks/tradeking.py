@@ -134,7 +134,6 @@ class TradekingOptionsQuotes(MongoNoBackCreateTask):
         if not chain_acquire:
             return {}
 
-
         chain = TradekingOptionsQuotes.retrieve_chain_syms(api, symbol)
         results = []
         for b in batch(chain, TradekingOptionsQuotes.batch_size):
@@ -147,4 +146,4 @@ class TradekingOptionsQuotes(MongoNoBackCreateTask):
                 batch_results = TradekingOptionsQuotes.retrieve_quotes(api, b)
                 results += batch_results
 
-        return results
+        return {'symbol': symbol, 'chain': results}
