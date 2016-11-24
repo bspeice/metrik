@@ -5,12 +5,11 @@ from datetime import timedelta
 from dateutil.parser import parse
 import logging
 
-from metrik.tasks.base import MongoCreateTask, MongoRateLimit
+from metrik.tasks.base import MongoCreateTask, MongoRateLimit, MongoNoBackCreateTask
 from metrik.conf import get_config
 
 
 class TradekingApi(object):
-
     format_json = '.json'
     format_xml = '.xml'
     root_url = 'https://api.tradeking.com/v1/'
@@ -85,3 +84,31 @@ class Tradeking1mTimesales(MongoCreateTask):
             logging.error('Unable to acquire lock for Tradeking ticker {}'
                           .format(symbol))
             return {}
+
+
+class TradekingOptionsQuotes(MongoNoBackCreateTask):
+    symbol = Parameter()
+
+    def get_collection_name(self):
+        return 'tradeking_options'
+
+    @staticmethod
+    def retrieve_chain_syms(api, symbol):
+        results = api.api_request('market/options/search', {
+            'symbol': symbol,
+            'query': 'unique:strikeprice'
+        }).json()['response']['quotes']['quote']
+
+        return [r['symbol'] for r in results]
+
+    @staticmethod
+    def retrieve_data(symbol):
+        tradeking = TradekingApi()
+
+        # We request a first rate limit lock to get the options chain
+        ratelimit = MongoRateLimit()
+        chain_acquire = ratelimit.acquire_lock(
+            service='tradeking',
+            limit=60,
+            interval=timedelta(minutes=1)
+        )

@@ -6,7 +6,7 @@ import pytest
 from six.moves import map
 from pytz import utc
 
-from metrik.tasks.tradeking import Tradeking1mTimesales
+from metrik.tasks.tradeking import Tradeking1mTimesales, TradekingOptionsQuotes, TradekingApi
 from metrik.trading_days import TradingDay
 from metrik.targets.mongo import MongoTarget
 from test.mongo_test import MongoTest
@@ -39,6 +39,15 @@ def test_returns_verifiable(ticker):
     tradeking_ohlc = (open, high, low, close)
 
     assert_allclose(tradeking_ohlc, yahoo_ohlc, rtol=1e-3)
+
+@pytest.mark.parametrize('ticker', [
+    'AAPL', 'GOOG', 'SPY', 'REGN', 'SWHC', 'BAC', 'NVCR', 'ARGT'
+])
+def test_chain_returns(ticker):
+    api = TradekingApi()
+    chain = TradekingOptionsQuotes.retrieve_chain_syms(api, ticker)
+
+    assert len(chain) > 20
 
 class TradekingTest(MongoTest):
 
