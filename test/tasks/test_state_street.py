@@ -24,7 +24,7 @@ class StateStreetHoldingTest(TestCase):
 
         self.assertEqual(holdings_dict['Ticker Symbol'], 'SDY')
         self.assertEqual(holdings_dict['Fund Name'], u'SPDR® S&P® Dividend ETF')
-        self.assertEqual(holdings_dict['holdings'][0]['Identifier'], 'T')
+        self.assertEqual(holdings_dict['holdings'][0]['Identifier'], 'PBCT')
 
     def test_spyd_holdings(self):
         holdings_dict = StateStreetHoldings.retrieve_data(
