@@ -16,7 +16,7 @@ class OptionsFlow(Flow):
                                         live=self.live)
         yield optionable
 
-        options_quotes = [TradekingOptionsQuotes(symbol=s,
+        options_quotes = [TradekingOptionsQuotes(symbol=s['Stock Symbol'],
                                                  current_datetime=self.present,
                                                  live=self.live)
                           for s in optionable.output().retrieve()['companies']]
