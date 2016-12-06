@@ -13,7 +13,7 @@ from metrik.flows.options_flow import OptionsFlow
 from metrik import __version__
 
 flows = {
-    'EquitiesFlow': OptionsFlow,
+    'EquitiesFlow': EquitiesFlow,
     'OptionsFlow': OptionsFlow
 }
 
